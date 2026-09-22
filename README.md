@@ -252,6 +252,14 @@ platforms hide entirely. Two worth noting:
 
 ---
 
+## Documentation
+
+- [Deployment guide](#step-by-step-setup) — this file, above
+- [Advanced operations](docs/advanced-operations.md) — node failure recovery, manual etcd backup/restore
+- [Automated etcd backup](docs/etcd-backup-automation.md) — S3 + IAM + cron automation, production-style
+
+---
+
 ## License
 
 MIT — see [LICENSE](LICENSE).
