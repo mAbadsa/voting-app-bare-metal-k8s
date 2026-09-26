@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metaData:
+  name: prune-test
+  namespace: voting-app
+data:
+  hello: GitOps
