@@ -19,8 +19,8 @@ deployment.
 
 ```mermaid
 graph LR
-    User((User)) -->|:30080| Vote[vote<br/>Python frontend]
-    User -->|:30081| Result[result<br/>Node.js frontend]
+    User((User)) -->|:31000| Vote[vote<br/>Python frontend]
+    User -->|:31001| Result[result<br/>Node.js frontend]
     Vote --> Redis[(redis<br/>cache/queue)]
     Redis --> Worker[worker<br/>vote processor]
     Worker --> DB[(postgres<br/>database)]
@@ -29,11 +29,11 @@ graph LR
 
 | Service  | Role                                      | Exposed via        |
 |----------|-------------------------------------------|---------------------|
-| `vote`   | Python frontend — users cast a vote       | NodePort `:30080`   |
+| `vote`   | Python frontend — users cast a vote       | NodePort `:31000`   |
 | `redis`  | In-memory queue between vote and worker   | ClusterIP (internal)|
 | `worker` | Moves votes from redis into postgres      | Not exposed         |
 | `db`     | PostgreSQL — stores the final tally       | ClusterIP (internal)|
-| `result` | Node.js frontend — live results           | NodePort `:30081`   |
+| `result` | Node.js frontend — live results           | NodePort `:31001`   |
 
 ---
 
@@ -196,8 +196,8 @@ kubectl get pods -n voting-app -w
 ### 10. Access the application
 
 ```bash
-curl http://<any-node-ip>:30080   # vote
-curl http://<any-node-ip>:30081   # result
+curl http://<any-node-ip>:31000   # vote
+curl http://<any-node-ip>:31001   # result
 ```
 
 Or open both in a browser pointed at any node's IP.
@@ -236,7 +236,7 @@ platforms hide entirely. Two worth noting:
 - Kubernetes cluster bootstrapping with `kubeadm` (control plane + multi-node joins)
 - Container runtime (`containerd`) installation and configuration
 - CNI networking with Calico
-- Kubernetes object design: Deployments, Services (ClusterIP/NodePort), Secrets, PersistentVolumeClaims
+- Kubernetes object design: Deployments, Services (ClusterIP/NodePort), Secrets
 - Linux systems troubleshooting (systemd units, journald logs, cgroups)
 - Infrastructure documented and version-controlled as code
 
@@ -245,7 +245,7 @@ platforms hide entirely. Two worth noting:
 ## Possible Improvements
 
 - Add Ingress (e.g. NGINX Ingress Controller) instead of raw NodePorts
-- Add a persistent storage provisioner (e.g. `local-path-provisioner`) for reliable PVC binding
+- Add a persistent storage provisioner (e.g. `local-path-provisioner`) and a PersistentVolumeClaim for postgres — currently there is no volume, so tally data is lost when the pod restarts
 - Convert manifests to a Helm chart for templated, repeatable deploys
 - Add CI (GitHub Actions) to lint/validate manifests on push
 - Add resource requests/limits and basic health checks (liveness/readiness probes) per Deployment
@@ -255,8 +255,9 @@ platforms hide entirely. Two worth noting:
 ## Documentation
 
 - [Deployment guide](#step-by-step-setup) — this file, above
-- [Advanced operations](docs/advanced-operations.md) — node failure recovery, manual etcd backup/restore
+- [Advanced operations](docs/advanced-operation.md) — node failure recovery, manual etcd backup/restore
 - [Automated etcd backup](docs/etcd-backup-automation.md) — S3 + IAM + cron automation, production-style
+- [Troubleshooting log](docs/troubleshooting.md) — real problems hit during the build, with captured output and fixes
 
 ---
 
